@@ -11,7 +11,7 @@ class Recommendation(Base):
     __tablename__ = "recommendations"
 
     id = Column(Integer, primary_key=True, index=True)
-    cv_file_id = Column(Integer, ForeignKey("cv_files.id"), nullable=False)
+    cv_file_id = Column(Integer, ForeignKey("cv_files.id"), nullable=False, unique=True) # Unique pour une seule recommandation par CV
     job_type = Column(String, nullable=True) # Type de poste suggéré
     environment = Column(String, nullable=True) # Environnement de travail idéal
     suggested_trainings = Column(JSON, nullable=True) # Formations complémentaires utiles (liste JSON)

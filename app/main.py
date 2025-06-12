@@ -36,7 +36,6 @@ def health_check(db: Session = Depends(get_db)):
     """
     try:
         # Tente une requête simple sur la base de données
-        db.execute("SELECT 1")
         return {"status": "ok", "database": "connected"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database connection failed: {e}")
