@@ -5,18 +5,20 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials # Importe HTTPBearer
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.db.session import get_db
-from app.models.user import User # Importe le modèle User
+from app.models.user import User
 
 # Contexte pour le hachage des mots de passe
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Schéma OAuth2 pour l'authentification par mot de passe (utilisé par FastAPI)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="users/token") # L'URL où les clients peuvent obtenir un token
+# Schéma HTTPBearer pour l'authentification.
+# FastAPI utilisera cela pour générer le champ "Authorize" dans Swagger UI.
+# Il s'attend à un en-tête "Authorization: Bearer <token>".
+security_scheme = HTTPBearer()
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Vérifie si un mot de passe clair correspond à un mot de passe haché."""
@@ -45,7 +47,10 @@ def decode_access_token(token: str) -> Optional[dict]:
     except JWTError:
         return None
 
-async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security_scheme), # Utilise notre schéma HTTPBearer
+    db: Session = Depends(get_db)
+) -> User:
     """
     Dépendance FastAPI pour obtenir l'utilisateur authentifié à partir du jeton.
     Lève une HTTPException si l'authentification échoue.
@@ -55,7 +60,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    payload = decode_access_token(token)
+    # Le token est dans credentials.credentials
+    payload = decode_access_token(credentials.credentials)
     if payload is None:
         raise credentials_exception
     user_id: str = payload.get("sub")

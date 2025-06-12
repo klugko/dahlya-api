@@ -12,9 +12,10 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
+    fullname = Column(String, nullable=True)
     password_hash = Column(String, nullable=False) # Hachage du mot de passe
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     # Relation avec les fichiers CV uploadés par cet utilisateur
-    cv_files = relationship("CVFile", back_populates="owner")
+    cv_files = relationship("CVFile", back_populates="owner", lazy="joined")
