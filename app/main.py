@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware # Importe le middleware CORS
 
 # Crée les tables dans la base de données (pour le développement initial).
 # En production, vous utiliserez Alembic pour les migrations.
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 # Initialisation de l'application FastAPI
 app = FastAPI(
