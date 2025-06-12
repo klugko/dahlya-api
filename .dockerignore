@@ -1,0 +1,11 @@
+    # project/.dockerignore
+    .git
+    .venv/
+    __pycache__/
+    *.pyc
+    *.log
+    .env
+    .pytest_cache/
+    alembic/versions/
+    uploaded_cvs/ # N'incluez pas les fichiers CV uploadés dans l'image Docker
+    
